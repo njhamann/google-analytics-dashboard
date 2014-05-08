@@ -1,0 +1,27 @@
+{
+  "name": "graphing-app",
+  "version": "0.0.1",
+  "authors": [
+    "Noah Hamann <njhamann@gmail.com>"
+  ],
+  "description": "graphing application",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.1",
+    "angular": "1.2.16",
+    "momentjs": "~2.6.0",
+    "d3": "~3.4.6",
+    "nvd3": "~1.1.15-beta",
+    "angularjs-nvd3-directives": "~0.0.7",
+    "bootstrap": "~3.1.1",
+    "angular-route": "~1.2.16"
+  }
+}
