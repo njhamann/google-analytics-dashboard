@@ -1,0 +1,7 @@
+var config = {
+    PARSE_APP_ID: '',
+    PARSE_JAVASCRIPT_KEY: '',
+    GOOGLE_CLIENT_ID: '',
+    GOOGLE_CLIENT_SECRET: ''
+}
+module.exports = config;
