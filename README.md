@@ -24,3 +24,9 @@ sass --watch scss:public/stylesheets/
 
 ## Info
 oauth token info: https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=
+
+design: https://dribbble.com/shots/1442141-Elastica-Dashboard/attachments/212746
+
+https://dribbble.com/shots/1332769-Panels-Dashboard/attachments/188298
+
+https://demo.baremetrics.io/dashboard

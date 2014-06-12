@@ -1,6 +1,7 @@
 body {
-  padding: 50px;
+  padding: 50px 0;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    background: #ebf1f4;
 }
 
 a {
@@ -9,4 +10,63 @@ a {
 .web-property-picker{
     max-height: 500px;
     overflow: auto;
+}
+
+//bootstrap overides
+.navbar-default {
+    background-color: #FFF;
+    border-color: #e7e7e7;
+}
+
+ul.web-property-picker{
+    ul li{
+        a{
+            display: block;
+            padding: 3px 20px 3px 30px;
+            clear: both;
+            font-weight: 400;
+            color: #333;
+        }
+        ul li{
+            a{
+                display: block;
+                padding: 3px 20px 3px 40px;
+                clear: both;
+                font-weight: 400;
+                color: #333;
+            }
+        }
+    }
+}
+
+.loading-screen{
+    width: 300px;
+    padding:20px;
+    margin: 20px auto;
+    background: #FFF;
+    text-align: center;
+}
+.dashboard-container{
+    margin-top: 20px;
+    .dashboard-controls{
+        border-radius: 0px;
+        border: none;
+        margin: 0px 5px 20px 5px;
+        .container-fluid{
+            padding: 0;
+        }
+    }
+
+    .cmpt-container{
+        padding:0px 5px 0 5px;
+        .cmpt{
+            float:left;
+            min-width: 350px;
+            min-height: 400px;
+            background: #FFF;
+            margin-right: 20px;
+            margin-bottom: 20px;
+
+        }
+    }
 }

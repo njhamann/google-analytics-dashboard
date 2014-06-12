@@ -65,7 +65,6 @@ passport.use(new GoogleStrategy({
             }
         },
         error: function(err){
-            console.log(err);
             done(err);
         }
     });

@@ -49,19 +49,19 @@ angular.module('GoogleAnalyticsDashboard.controllers', [])
   .controller('Navigation', ['$scope', function($scope) {
 
   }])
+  .controller('Dashboard', ['$scope', function($scope) {
+
+  }])
+  .controller('Controls', ['$scope', function($scope) {
+
+  }])
+  .controller('Components', ['$scope', function($scope) {
+
+  }])
   .controller('LoadingScreen', ['$scope', function($scope) {
 
   }])
   .controller('LoginModal', ['$scope', function($scope) {
-
-  }])
-  .controller('Chart', ['$scope', function($scope) {
-
-  }])
-  .controller('DataForm', ['$scope', function($scope) {
-
-  }])
-  .controller('OptionForm', ['$scope', function($scope) {
 
   }]);
 
