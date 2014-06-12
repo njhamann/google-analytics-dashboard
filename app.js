@@ -32,8 +32,8 @@ app.use(express.static(path.join(__dirname, 'bower_components')));
 
 
 //passport
-Parse.initialize(config.PARSE_APP_ID, config.PARSE_JAVASCRIPT_KEY);
 var GoogleUser = Parse.Object.extend('GoogleUser');
+Parse.initialize(config.PARSE_APP_ID, config.PARSE_JAVASCRIPT_KEY);
 passport.use(new GoogleStrategy({
     clientID: config.GOOGLE_CLIENT_ID,
     clientSecret: config.GOOGLE_CLIENT_SECRET,
@@ -42,22 +42,26 @@ passport.use(new GoogleStrategy({
     var query = new Parse.Query(GoogleUser);
     query.equalTo('gid', profile.id);
     //find or create user
+    console.log(refreshToken);
     query.find({
         success: function(results){
             console.log(results);
             if(results.length){
                 done(null, results[0].toJSON());
             }else{
+                
+                var userJSON = profile._json;
+                userJSON.gid = userJSON.id;
+                userJSON.accessToken = accessToken;
+                userJSON.refreshToken = refreshToken;
+                delete userJSON.id;
                 var googleUser = new GoogleUser();
-                googleUser.save({
-                    gid: profile.id,
-                    name: profile.displayName
-                }, {
+                googleUser.save(userJSON, {
                     success: function(user) {
-                        done(null, user);
+                        done(null, user.toJSON());
                     },
                     error: function(user, err) {
-                        done(err, user);
+                        done(err, user.toJSON());
                     }
                 }); 
             }
