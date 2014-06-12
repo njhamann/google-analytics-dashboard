@@ -1,7 +1,7 @@
 body {
   padding: 50px 0;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-    background: #ebf1f4;
+    background: #F5F5F5;
 }
 
 a {
@@ -14,8 +14,18 @@ a {
 
 //bootstrap overides
 .navbar-default {
-    background-color: #FFF;
-    border-color: #e7e7e7;
+    background-color: #30B0ED;
+    border:none;
+    a{
+        color: #FFF;
+    }
+}
+
+.navbar-default .navbar-brand{
+    color: #FFF;
+}
+.navbar-default .navbar-nav>li>a{
+    color: #FFF;
 }
 
 ul.web-property-picker{
@@ -61,8 +71,8 @@ ul.web-property-picker{
         padding:0px 5px 0 5px;
         .cmpt{
             float:left;
-            min-width: 350px;
-            min-height: 400px;
+            min-width: 300px;
+            min-height: 350px;
             background: #FFF;
             margin-right: 20px;
             margin-bottom: 20px;

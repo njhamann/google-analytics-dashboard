@@ -24,7 +24,7 @@
         ng-controller="Navigation">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a class="navbar-brand" href="#">Google Analytics Dashboard</a>
+                <a class="navbar-brand" href="#">gadzooks</a>
             </div>
             <ul class="nav navbar-nav">
                 <li class="dropdown">
@@ -45,7 +45,25 @@
                         </li>
                     </ul>
                 </li>
-                <li><a href="#">Report</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports <b class="caret"></b></a>
+                    <ul class="dropdown-menu web-property-picker" role="menu">
+                        <li><a href="#">Dashboard</a></li>
+                        <li><a href="#">Top ranked</a></li>
+                        <li><a href="#">Month over month</a></li>
+                        <li><a href="#">Live</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Timeframe <b class="caret"></b></a>
+                    <ul class="dropdown-menu web-property-picker" role="menu">
+                        <li><a href="#" ng-click="pickTime(0)">Today</a></li>
+                        <li><a href="#" ng-click="pickTime(1)">Yesterday</a></li>
+                        <li><a href="#" ng-click="pickTime(7)">Last 7 Days</a></li>
+                        <li><a href="#" ng-click="pickTime(14)">Last 14 Days</a></li>
+                        <li><a href="#" ng-click="pickTime(30)">Last 30 Days</a></li>
+                    </ul>
+                </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown" ng-show="$root.user">
@@ -102,10 +120,17 @@
               <% } %>
               -->
               <div class="cmpt-container">
-                  <div class="cmpt">
-                  </div>
-                  <div class="cmpt">
-                  </div>
+                    <ul class="list-unstyled">
+                        <li class="cmpt" ng-controller="UsersBlock">
+                            <p>Users</p>
+                        </li>
+                        <li class="cmpt" ng-controller="VisitsBlock">
+                            <p>Visits</p>
+                        </li>
+                        <li class="cmpt" ng-controller="BounceBlock">
+                            <p>Bounce</p>
+                        </li>
+                    </ul>
               </div>
             </div>
         </div>

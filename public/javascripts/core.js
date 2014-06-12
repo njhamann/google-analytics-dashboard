@@ -1,7 +1,7 @@
 'use strict';
 
 // Declare app level module which depends on filters, and services
-angular.module('GoogleAnalyticsDashboard', [
+var mod = angular.module('GoogleAnalyticsDashboard', [
   'GoogleAnalyticsDashboard.filters',
   'GoogleAnalyticsDashboard.services',
   'GoogleAnalyticsDashboard.directives',
@@ -41,14 +41,25 @@ config(['$routeProvider', function($routeProvider) {
             });
         */
     }
-
+    $rootScope.layoutConfig = [
+        {
+            controller: 'UsersBlock'
+        },
+        {
+            controller: 'VisitsBlock'
+        },
+        {
+            controller: 'BounceBlock'
+        }
+    ];
 }]);
-
 /* Controllers */
 angular.module('GoogleAnalyticsDashboard.controllers', [])
-  .controller('Navigation', ['$scope', function($scope) {
-
-  }])
+    .controller('Navigation', ['$scope', function($scope) {
+        var selectProfile = function(profile){
+            $scope.$root.selectedProfile = profile;
+        };
+    }])
   .controller('Dashboard', ['$scope', function($scope) {
 
   }])
@@ -56,6 +67,15 @@ angular.module('GoogleAnalyticsDashboard.controllers', [])
 
   }])
   .controller('Components', ['$scope', function($scope) {
+
+  }])
+  .controller('UsersBlock', ['$scope', function($scope) {
+
+  }])
+  .controller('VisitsBlock', ['$scope', function($scope) {
+
+  }])
+  .controller('BounceBlock', ['$scope', function($scope) {
 
   }])
   .controller('LoadingScreen', ['$scope', function($scope) {
