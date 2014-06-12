@@ -8,7 +8,6 @@ var session = require('express-session');
 var bodyParser = require('body-parser');
 var Parse = require('parse').Parse;
 var routes = require('./routes/index');
-var users = require('./routes/users');
 
 var passport = require('passport');
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
@@ -84,7 +83,6 @@ passport.deserializeUser(function(id, done) {
 });
 
 app.use('/', routes);
-app.use('/users', users);
 
 
 
