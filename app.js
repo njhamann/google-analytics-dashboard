@@ -5,6 +5,7 @@ var favicon = require('static-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
+var RedisStore = require('connect-redis')(session);
 var bodyParser = require('body-parser');
 var Parse = require('parse').Parse;
 var routes = require('./routes/index');
@@ -23,7 +24,8 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(cookieParser());
-app.use(session({ secret: 'keyboard cat' }));
+//app.use(session({ secret: 'keyboard cat' }));
+app.use(session({ store: new RedisStore(), secret: 'keyboard cat' }))
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -41,14 +43,11 @@ passport.use(new GoogleStrategy({
     var query = new Parse.Query(GoogleUser);
     query.equalTo('gid', profile.id);
     //find or create user
-    console.log(refreshToken);
     query.find({
         success: function(results){
-            console.log(results);
             if(results.length){
                 done(null, results[0].toJSON());
             }else{
-                
                 var userJSON = profile._json;
                 userJSON.gid = userJSON.id;
                 userJSON.accessToken = accessToken;
@@ -65,7 +64,9 @@ passport.use(new GoogleStrategy({
                 }); 
             }
         },
-        error: function(error){
+        error: function(err){
+            console.log(err);
+            done(err);
         }
     });
 }));
@@ -81,7 +82,7 @@ passport.deserializeUser(function(id, done) {
             done(null, googleUser.toJSON());
         },
         error: function(googleUser, err) {
-            done(err, googleUser.toJSON());
+            done(err, googleUser);
         }
     });
 });
