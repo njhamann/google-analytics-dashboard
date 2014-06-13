@@ -6,19 +6,26 @@ var mod = angular.module('GoogleAnalyticsDashboard', [
   'GoogleAnalyticsDashboard.services',
   'GoogleAnalyticsDashboard.directives',
   'GoogleAnalyticsDashboard.controllers',
-  'ngRoute'
+  'ngRoute',
+  'ngCookies'
 ]).
 config(['$routeProvider', function($routeProvider) {
+
     $routeProvider.when('/view1', {templateUrl: 'partials/partial1.html', controller: 'MyCtrl1'});
     $routeProvider.when('/view2', {templateUrl: 'partials/partial2.html', controller: 'MyCtrl2'});
     $routeProvider.otherwise({redirectTo: '/view1'});
-}]).run(['$rootScope', '$http', function($rootScope, $http) {
+
+}]).run(['$rootScope', '$http', '$cookies', function($rootScope, $http, $cookies) {
+
     $rootScope.user = GAD.user;
+    $rootScope.currentProfile;
+
     if($rootScope.user){
         $http.get('/api/analytics/management/accountSummaries/list')
             .success(function(data){
                 if(data.items) $rootScope.accounts = data.items;
             });
+    
         //account
         //property
         //view
@@ -41,23 +48,15 @@ config(['$routeProvider', function($routeProvider) {
             });
         */
     }
-    $rootScope.layoutConfig = [
-        {
-            controller: 'UsersBlock'
-        },
-        {
-            controller: 'VisitsBlock'
-        },
-        {
-            controller: 'BounceBlock'
-        }
-    ];
+    
+
 }]);
 /* Controllers */
 angular.module('GoogleAnalyticsDashboard.controllers', [])
-    .controller('Navigation', ['$scope', function($scope) {
-        var selectProfile = function(profile){
-            $scope.$root.selectedProfile = profile;
+    .controller('Navigation', ['$scope', '$cookieStore', function($scope, $cookieStore) {
+        $scope.selectProfile = function(profile){
+            $scope.$root.currentProfile = profile;
+            $cookieStore.put('currentProfile', profile);
         };
     }])
   .controller('Dashboard', ['$scope', function($scope) {
