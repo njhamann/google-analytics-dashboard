@@ -59,3 +59,14 @@ ul.web-property-picker ul li ul li a {
       background: #FFF;
       margin-right: 20px;
       margin-bottom: 20px; }
+      .dashboard-container .cmpt-container .cmpt .primary p {
+        text-align: center; }
+        .dashboard-container .cmpt-container .cmpt .primary p.primary-stat {
+          font-size: 45px;
+          margin-top: 30px;
+          font-weight: 600;
+          color: #666;
+          margin-bottom: 5px; }
+        .dashboard-container .cmpt-container .cmpt .primary p.primary-stat-label {
+          font-size: 22px;
+          color: #999; }

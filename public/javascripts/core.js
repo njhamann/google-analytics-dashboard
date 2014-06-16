@@ -6,7 +6,8 @@ var mod = angular.module('GoogleAnalyticsDashboard', [
   'GoogleAnalyticsDashboard.services',
   'GoogleAnalyticsDashboard.directives',
   'GoogleAnalyticsDashboard.controllers',
-  'ngRoute'
+  'ngRoute',
+  'ngCookies'
 ]).
 config(['$routeProvider', function($routeProvider) {
     $routeProvider.when('/view1', {templateUrl: 'partials/partial1.html', controller: 'MyCtrl1'});
@@ -14,51 +15,91 @@ config(['$routeProvider', function($routeProvider) {
     $routeProvider.otherwise({redirectTo: '/view1'});
 }]).run(['$rootScope', '$http', function($rootScope, $http) {
     $rootScope.user = GAD.user;
+    $rootScope.accounts = [];
+    $rootScope.properties = [];
+    $rootScope.profiles = [];
+    $rootScope.timeRange = 7;
     if($rootScope.user){
         $http.get('/api/analytics/management/accountSummaries/list')
             .success(function(data){
-                if(data.items) $rootScope.accounts = data.items;
+                if(data.items && data.items.length){ 
+                    $rootScope.accounts = data.items;
+                    $rootScope.accounts.forEach(function(account){
+                        account.webProperties.forEach(function(property){
+                            $rootScope.properties.push(property);
+                            if(property.profiles){
+                                property.profiles.forEach(function(profile){
+                                    $rootScope.profiles.push(profile);
+                                });
+                            }
+                        });
+                    });
+                    if($rootScope.profiles.length && !$rootScope.profile){
+                        $rootScope.profile = $rootScope.profiles[0];
+                    }
+                }
             });
-        //account
-        //property
-        //view
-
-        //this works
-        /*
+    }
+    
+    var requestStats = function(){
+        if(!$rootScope.profile) return;
+        var defaultTimeRange = 7;
+        var endMoment = moment().startOf('day');
+        var startMoment = moment().startOf('day')
+            .subtract('days', $rootScope.timeRange || defaultTimeRange);
         var params = {
-            'ids': 'ga:44967999',
-            'start-date': '2014-06-01',
-            'end-date': '2014-06-12',
-            'metrics': 'ga:sessions,ga:bounces',
-            'dimensions': 'ga:source,ga:keyword,ga:date',
-            'sort': '-ga:sessions,ga:source',
-            'max-results': 25
+            'ids': 'ga:' + $rootScope.profile.id,
+            'start-date': startMoment.format('YYYY-MM-DD'),
+            'end-date': endMoment.format('YYYY-MM-DD'),
+            'metrics': 'ga:sessions,ga:users,ga:bounceRate'
         } 
         
         $http.get('/api/analytics/data/ga/get', { params: params })
             .success(function(data){
-                $rootScope.metric = data;
+                console.log(data);
+                if(data.columnHeaders 
+                    && data.rows
+                    && data.rows.length){
+                    $rootScope.accountData = data;
+                    $rootScope.accountData
+                        .columnHeaders
+                        .forEach(function(header, i){
+                        console.log(header.name);
+                        $rootScope.$broadcast(header.name, {
+                            header: header,
+                            data: $rootScope.accountData.rows[0][i]
+                        });
+
+                    });
+                }
             });
-        */
-    }
-    $rootScope.layoutConfig = [
-        {
-            controller: 'UsersBlock'
-        },
-        {
-            controller: 'VisitsBlock'
-        },
-        {
-            controller: 'BounceBlock'
-        }
-    ];
+    };
+
+    
+    $rootScope.$watch('timeRange', requestStats);
+    $rootScope.$watch('profile', requestStats);
+
 }]);
 /* Controllers */
 angular.module('GoogleAnalyticsDashboard.controllers', [])
-    .controller('Navigation', ['$scope', function($scope) {
-        var selectProfile = function(profile){
-            $scope.$root.selectedProfile = profile;
+    .controller('Navigation', ['$scope', '$cookieStore', function($scope, $cookieStore) {
+        
+        $scope.selectProfile = function(profile){
+            $scope.$root.profile = profile;
+            $cookieStore.put('profile', profile);     
         };
+        
+        $scope.pickTime = function(timeRange){
+            $scope.$root.timeRange = timeRange;
+            $cookieStore.put('timeRange', timeRange);     
+        };
+        
+        //set profile and time range if one exists
+        var cProfile = $cookieStore.get('profile');
+        var cTimeRange = $cookieStore.get('timeRange');
+        $scope.$root.timeRange = cTimeRange || $scope.$root.timeRange;
+        $scope.$root.profile = cProfile || $scope.$root.profile;
+
     }])
   .controller('Dashboard', ['$scope', function($scope) {
 
@@ -69,13 +110,24 @@ angular.module('GoogleAnalyticsDashboard.controllers', [])
   .controller('Components', ['$scope', function($scope) {
 
   }])
-  .controller('UsersBlock', ['$scope', function($scope) {
-
-  }])
-  .controller('VisitsBlock', ['$scope', function($scope) {
+    .controller('UsersBlock', ['$scope', function($scope) {   
+        $scope.$on('ga:users', function(e, data){
+            $scope.number = data.data;
+            console.log(data);
+        });
+    }])
+  .controller('SessionBlock', ['$scope', '$http', function($scope, $http) {
+        $scope.$on('ga:sessions', function(e, data){
+            $scope.number = data.data;
+            console.log(data);
+        });
 
   }])
   .controller('BounceBlock', ['$scope', function($scope) {
+        $scope.$on('ga:bounceRate', function(e, data){
+            $scope.number = Math.round(data.data);
+            console.log(data);
+        });
 
   }])
   .controller('LoadingScreen', ['$scope', function($scope) {

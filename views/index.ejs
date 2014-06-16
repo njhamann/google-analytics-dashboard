@@ -28,13 +28,13 @@
             </div>
             <ul class="nav navbar-nav">
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Accounts <b class="caret"></b></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{$root.profile.name}} <b class="caret"></b></a>
                     <ul class="dropdown-menu web-property-picker" role="menu">
                         <li ng-repeat="account in $root.accounts">
                             <a href="#">{{account.name}}</a>
                             <ul class="list-unstyled">
                                 <li ng-repeat="webProperty in account.webProperties" ng-show="webProperty.profiles">
-                                    <a href="#" ng-click="selectProperty(webProperty)">{{webProperty.name}}</a>
+                                    <a href="#">{{webProperty.name}}</a>
                                     <ul class="list-unstyled">
                                         <li ng-repeat="profile in webProperty.profiles">
                                             <a href="#" ng-click="selectProfile(profile)">{{profile.name}}</a>
@@ -55,7 +55,7 @@
                     </ul>
                 </li>
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Timeframe <b class="caret"></b></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Last {{$root.timeRange}} days <b class="caret"></b></a>
                     <ul class="dropdown-menu web-property-picker" role="menu">
                         <li><a href="#" ng-click="pickTime(0)">Today</a></li>
                         <li><a href="#" ng-click="pickTime(1)">Yesterday</a></li>
@@ -122,13 +122,22 @@
               <div class="cmpt-container">
                     <ul class="list-unstyled">
                         <li class="cmpt" ng-controller="UsersBlock">
-                            <p>Users</p>
+                            <div class="primary">
+                                <p class="primary-stat" ng-bind="number || 0 |  number"></p>
+                                <p class="primary-stat-label">Users</p>
+                            </div>
                         </li>
-                        <li class="cmpt" ng-controller="VisitsBlock">
-                            <p>Visits</p>
+                        <li class="cmpt" ng-controller="SessionBlock">
+                            <div class="primary">
+                                <p class="primary-stat" ng-bind="number || 0 | number"></p>
+                                <p class="primary-stat-label">Visits</p>
+                            </div>
                         </li>
                         <li class="cmpt" ng-controller="BounceBlock">
-                            <p>Bounce</p>
+                            <div class="primary">
+                                <p class="primary-stat"><span ng-bind="number || 0"></span>%</p>
+                                <p class="primary-stat-label">Bounce</p>
+                            </div>
                         </li>
                     </ul>
               </div>
@@ -162,9 +171,11 @@
         GAD.user = <%- JSON.stringify(user || null) %>;
     </script> 
     <script src="/jquery/dist/jquery.min.js"></script>
+    <script src="/momentjs/min/moment.min.js"></script>
     <script src="/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="/angular/angular.min.js"></script>
     <script src="/angular-route/angular-route.min.js"></script>
+    <script src="/angular-cookies/angular-cookies.min.js"></script>
     <script src="/d3/d3.min.js"></script>
     <script src="/javascripts/core.js"></script>
   </body>
