@@ -15,7 +15,12 @@ config(['$routeProvider', function($routeProvider) {
     $routeProvider.when('/view2', {templateUrl: 'partials/partial2.html', controller: 'MyCtrl2'});
     $routeProvider.otherwise({redirectTo: '/view1'});
 
-}]).run(['$rootScope', '$http', '$cookies', function($rootScope, $http, $cookies) {
+}]).run([
+    '$rootScope', 
+    '$http', 
+    '$cookies', 
+    'requestStats',
+    function($rootScope, $http, $cookies, requestStats) {
 
     $rootScope.user = GAD.user;
     $rootScope.accounts = [];
@@ -44,45 +49,83 @@ config(['$routeProvider', function($routeProvider) {
             });
     }
     
-    var requestStats = function(){
+    var getStats = function(){
         if(!$rootScope.profile) return;
-        var defaultTimeRange = 7;
+        
         var endMoment = moment().startOf('day');
         var startMoment = moment().startOf('day')
-            .subtract('days', $rootScope.timeRange || defaultTimeRange);
-        var params = {
-            'ids': 'ga:' + $rootScope.profile.id,
-            'start-date': startMoment.format('YYYY-MM-DD'),
-            'end-date': endMoment.format('YYYY-MM-DD'),
-            'metrics': 'ga:sessions,ga:users,ga:bounceRate'
-        } 
-        
-        $http.get('/api/analytics/data/ga/get', { params: params })
-            .success(function(data){
-                console.log(data);
-                if(data.columnHeaders 
-                    && data.rows
-                    && data.rows.length){
-                    $rootScope.accountData = data;
-                    $rootScope.accountData
-                        .columnHeaders
-                        .forEach(function(header, i){
-                        console.log(header.name);
-                        $rootScope.$broadcast(header.name, {
-                            header: header,
-                            data: $rootScope.accountData.rows[0][i]
-                        });
+            .subtract('days', $rootScope.timeRange);
+        var pastEndMoment = moment().startOf('day')
+            .subtract('days', $rootScope.timeRange);
+        var pastStartMoment = moment().startOf('day')
+            .subtract('days', $rootScope.timeRange*2);
+        var metrics = [
+            'ga:sessions', 
+            'ga:users', 
+            'ga:bounceRate',
+            'ga:pageviews',
+            'ga:avgSessionDuration',
+            'ga:percentNewSessions',
+            'ga:pageviewsPerSession'
+        ].join();
 
-                    });
-                }
+        //get current 
+        requestStats([{
+            start: pastStartMoment.format('YYYY-MM-DD'),
+            end: pastEndMoment.format('YYYY-MM-DD'),
+            profileId: 'ga:' + $rootScope.profile.id,
+            metrics: metrics,
+        },
+        {
+            start: startMoment.format('YYYY-MM-DD'),
+            end: endMoment.format('YYYY-MM-DD'),
+            profileId: 'ga:' + $rootScope.profile.id,
+            metrics: metrics,
+        }]).then(function(d){
+            
+            var prettyMap = { 
+                'ga:sessions': 'Sessions',
+                'ga:users': 'Users', 
+                'ga:bounceRate': 'Bounce Rate',
+                'ga:pageviews': 'Pageviews',
+                'ga:avgSessionDuration': 'Average Session Duration',
+                'ga:percentNewSessions': '% New Sessions',
+                'ga:pageviewsPerSession': 'Pageviews per Session'
+            };
+            
+            //current
+            var metricArr = [];
+            d.forEach(function(data, i){
+                var dataKey = i === 1 ? 'current' : 'past';
+                data.data.columnHeaders.forEach(function(header, i){
+                    if(!metricArr[i]) metricArr.push({});
+                    metricArr[i].header = header;
+                    metricArr[i].header.display = prettyMap[header.name];
+                    if(data.data.rows && data.data.rows[0]){
+                        metricArr[i][dataKey] = data.data.rows[0][i];
+                    }
+                });     
             });
+            
+            metricArr = _.map(metricArr, function(metric){
+                metric.changed = Math.round(((metric.current-metric.past)/metric.past)*100/1);
+                return metric;
+            });
+             
+            $rootScope.$broadcast('blockResponse', metricArr);
+            
+        });
+        
+
     };
 
     
-    $rootScope.$watch('timeRange', requestStats);
-    $rootScope.$watch('profile', requestStats);
+    //listeners
+    $rootScope.$watch('timeRange', getStats);
+    $rootScope.$watch('profile', getStats);
 
 }]);
+
 /* Controllers */
 angular.module('GoogleAnalyticsDashboard.controllers', [])
     .controller('Navigation', ['$scope', '$cookieStore', function($scope, $cookieStore) {
@@ -104,35 +147,17 @@ angular.module('GoogleAnalyticsDashboard.controllers', [])
         $scope.$root.profile = cProfile || $scope.$root.profile;
 
     }])
-  .controller('Dashboard', ['$scope', function($scope) {
-
-  }])
-  .controller('Controls', ['$scope', function($scope) {
-
-  }])
-  .controller('Components', ['$scope', function($scope) {
-
-  }])
-    .controller('UsersBlock', ['$scope', function($scope) {   
-        $scope.$on('ga:users', function(e, data){
-            $scope.number = data.data;
-            console.log(data);
+    .controller('Dashboard', ['$scope', function($scope) {
+    }])
+    .controller('Controls', ['$scope', function($scope) {
+    }])
+    .controller('Components', ['$scope', function($scope) {
+    }])
+    .controller('Blocks', ['$scope', '$http', function($scope, $http) {
+        $scope.$on('blockResponse', function(e, data){
+            $scope.blocks = data;
         });
     }])
-  .controller('SessionBlock', ['$scope', '$http', function($scope, $http) {
-        $scope.$on('ga:sessions', function(e, data){
-            $scope.number = data.data;
-            console.log(data);
-        });
-
-  }])
-  .controller('BounceBlock', ['$scope', function($scope) {
-        $scope.$on('ga:bounceRate', function(e, data){
-            $scope.number = Math.round(data.data);
-            console.log(data);
-        });
-
-  }])
   .controller('LoadingScreen', ['$scope', function($scope) {
 
   }])
@@ -160,4 +185,27 @@ angular.module('GoogleAnalyticsDashboard.filters', []).
 
 /* Services */
 angular.module('GoogleAnalyticsDashboard.services', []).
-  value('version', '0.1');
+    factory('requestStats', [
+    '$http', 
+    '$q', 
+    function($http, $q){
+        return function(options) {
+            if(!options) return;   
+            
+            var promises = [];
+            var optionsArr = angular.isArray(options) ? options : [options];
+            optionsArr.forEach(function(opt){
+                var params = {
+                    'ids': opt.profileId,
+                    'start-date': opt.start,
+                    'end-date': opt.end,
+                    'metrics': opt.metrics
+                };
+                
+                var promise = $http.get('/api/analytics/data/ga/get', { params: params });
+                promises.push(promise);
+            });
+
+            return $q.all(promises);
+        };
+    }]);

@@ -46,15 +46,6 @@
                     </ul>
                 </li>
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports <b class="caret"></b></a>
-                    <ul class="dropdown-menu web-property-picker" role="menu">
-                        <li><a href="#">Dashboard</a></li>
-                        <li><a href="#">Top ranked</a></li>
-                        <li><a href="#">Month over month</a></li>
-                        <li><a href="#">Live</a></li>
-                    </ul>
-                </li>
-                <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Last {{$root.timeRange}} days <b class="caret"></b></a>
                     <ul class="dropdown-menu web-property-picker" role="menu">
                         <li><a href="#" ng-click="pickTime(0)">Today</a></li>
@@ -62,6 +53,14 @@
                         <li><a href="#" ng-click="pickTime(7)">Last 7 Days</a></li>
                         <li><a href="#" ng-click="pickTime(14)">Last 14 Days</a></li>
                         <li><a href="#" ng-click="pickTime(30)">Last 30 Days</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span ng-bind="reportType || 'User Report'"></span> <b class="caret"></b></a>
+                    <ul class="dropdown-menu web-property-picker" role="menu">
+                        <li><a href="#" ng-click="reportType = 'User Report'; changeReport('user')">User Report</a></li>
+                        <li><a href="#" ng-click="reportType = 'Content Report'; changeReport('user')">Content Report</a></li>
+                        <li><a href="#" ng-click="reportType = 'Live Report'; changeReport('live')">Live Report</a></li>
                     </ul>
                 </li>
             </ul>
@@ -87,60 +86,48 @@
     </div>
     
     <div class="container-fluid dashboard-container" ng-controller="Dashboard" ng-show="$root.user && $root.accounts">
+
         <!--
         <nav class="navbar navbar-default dashboard-controls" role="navigation">
             <div class="container-fluid">
-
                 <div class="collapse navbar-collapse">
-                  <ul class="nav navbar-nav">
-                    <li class=""><a href="#">Report Type</a></li>
-                    <li class=""><a href="#">Time Scale</a></li>
-                    <li class="dropdown">
-                      <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
-                      <ul class="dropdown-menu">
-                        <li><a href="#">Action</a></li>
-                        <li><a href="#">Another action</a></li>
-                        <li><a href="#">Something else here</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#">Separated link</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#">One more separated link</a></li>
-                      </ul>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </nav> 
--->
-        <div class="row" ng-controller="Components" ng-show="$root.accounts">
-            <div class="col-sm-12">
-              <!--
-              <% if(user) { %>
-              <p><%= user.name %></p>
-              <% } %>
-              -->
-              <div class="cmpt-container">
-                    <ul class="list-unstyled">
-                        <li class="cmpt" ng-controller="UsersBlock">
-                            <div class="primary">
-                                <p class="primary-stat" ng-bind="number || 0 |  number"></p>
-                                <p class="primary-stat-label">Users</p>
-                            </div>
-                        </li>
-                        <li class="cmpt" ng-controller="SessionBlock">
-                            <div class="primary">
-                                <p class="primary-stat" ng-bind="number || 0 | number"></p>
-                                <p class="primary-stat-label">Visits</p>
-                            </div>
-                        </li>
-                        <li class="cmpt" ng-controller="BounceBlock">
-                            <div class="primary">
-                                <p class="primary-stat"><span ng-bind="number || 0"></span>%</p>
-                                <p class="primary-stat-label">Bounce</p>
-                            </div>
+                    <ul class="nav navbar-nav">
+                        <li class=""><a href="#">Report Type</a></li>
+                        <li class=""><a href="#">Time Scale</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">Action</a></li>
+                                <li><a href="#">Another action</a></li>
+                                <li><a href="#">Something else here</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#">Separated link</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#">One more separated link</a></li>
+                            </ul>
                         </li>
                     </ul>
-              </div>
+                </div>
+            </div>
+        </nav> 
+        -->
+        
+        <div class="row" ng-controller="Components" ng-show="$root.accounts">
+            <div class="col-sm-12">
+              <div class="cmpt-container">
+                    <ul class="list-unstyled" ng-controller="Blocks">
+                    
+                        <li class="cmpt" ng-repeat="block in blocks">
+                            <div class="primary">
+                                <p class="primary-stat-label">{{block.header.display}}</p>
+                                <p class="primary-stat" ng-bind="block.current || 0 | number"></p>
+                                <p class="changed-stat"><span ng-bind="block.changed || 0 | number: 2"></span>%</p>
+                                <p class="changed-vs-stat"><span ng-bind="block.current || 0 | number"></span> compared to <span ng-bind="block.past || 0 | number"></span></p>
+                            </div>
+                        </li>
+                    
+                    </ul>
+                </div>
             </div>
         </div>
     </div><!-- /.container -->
@@ -170,6 +157,7 @@
         var GAD = {};
         GAD.user = <%- JSON.stringify(user || null) %>;
     </script> 
+    <script src="/lodash/dist/lodash.min.js"></script>
     <script src="/jquery/dist/jquery.min.js"></script>
     <script src="/momentjs/min/moment.min.js"></script>
     <script src="/bootstrap/dist/js/bootstrap.min.js"></script>
