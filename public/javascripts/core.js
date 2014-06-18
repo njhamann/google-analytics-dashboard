@@ -27,6 +27,7 @@ config(['$routeProvider', function($routeProvider) {
     $rootScope.properties = [];
     $rootScope.profiles = [];
     $rootScope.timeRange = 7;
+    $rootScope.showLoading = true;
     if($rootScope.user){
         $http.get('/api/analytics/management/accountSummaries/list')
             .success(function(data){
@@ -37,6 +38,9 @@ config(['$routeProvider', function($routeProvider) {
                             $rootScope.properties.push(property);
                             if(property.profiles){
                                 property.profiles.forEach(function(profile){
+                                    profile.property = { name: property.name };//property;
+                                    profile.account = { name: property.name };//account;
+                                    console.log(profile);
                                     $rootScope.profiles.push(profile);
                                 });
                             }
@@ -51,6 +55,7 @@ config(['$routeProvider', function($routeProvider) {
     
     var getStats = function(){
         if(!$rootScope.profile) return;
+        $rootScope.showLoading = true;
         
         var endMoment = moment().startOf('day');
         var startMoment = moment().startOf('day')
@@ -108,11 +113,12 @@ config(['$routeProvider', function($routeProvider) {
             });
             
             metricArr = _.map(metricArr, function(metric){
-                metric.changed = Math.round(((metric.current-metric.past)/metric.past)*100/1);
+                metric.changed = ((metric.current-metric.past)/metric.past)*100/1;
                 return metric;
             });
              
             $rootScope.$broadcast('blockResponse', metricArr);
+            $rootScope.showLoading = false;
             
         });
         
@@ -136,16 +142,21 @@ angular.module('GoogleAnalyticsDashboard.controllers', [])
         };
         
         $scope.pickTime = function(timeRange){
+            $scope.endTimeRange = moment().startOf('day').format('MM/DD/YYYY');
+            $scope.startTimeRange = moment().startOf('day')
+                .subtract('days', timeRange).format('MM/DD/YYYY');
+
             $scope.$root.timeRange = timeRange;
             $cookieStore.put('timeRange', timeRange);     
         };
+
         
         //set profile and time range if one exists
         var cProfile = $cookieStore.get('profile');
         var cTimeRange = $cookieStore.get('timeRange');
-        $scope.$root.timeRange = cTimeRange || $scope.$root.timeRange;
-        $scope.$root.profile = cProfile || $scope.$root.profile;
-
+        $scope.pickTime(cTimeRange || $scope.$root.timeRange);
+        $scope.selectProfile(cProfile || $scope.$root.profile);
+        
     }])
     .controller('Dashboard', ['$scope', function($scope) {
     }])

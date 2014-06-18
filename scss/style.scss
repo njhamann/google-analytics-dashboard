@@ -28,22 +28,61 @@ a {
     color: #FFF;
 }
 
-ul.web-property-picker{
-    ul li{
-        a{
+.navbar-nav>li>a.dropdown-toggle.double{
+    padding: 9px 25px 8px 15px;
+    line-height: 16px;
+    position: relative;
+    span{
+        &.first{
             display: block;
-            padding: 3px 20px 3px 30px;
-            clear: both;
-            font-weight: 400;
-            color: #333;
+            width: 100%;
+        }
+        &.second{
+            font-size:12px;
+            opacity: 0.6;
+        }
+    }
+    .caret{
+        position: absolute;
+        right: 8px;
+        top: 23px;
+    }
+}
+
+ul.web-property-picker{
+    li{
+        a{ 
+            font-weight: 600; 
+            font-size: 18px;
         }
         ul li{
             a{
+                font-size: 14px;
+
                 display: block;
-                padding: 3px 20px 3px 40px;
+                padding: 3px 20px 3px 35px;
                 clear: both;
                 font-weight: 400;
                 color: #333;
+                cursor: default;
+                border-top: 1px solid #CCC;
+                &:hover{
+                    text-decoration: none;
+                }
+            }
+            ul li{
+                a{
+                    display: block;
+                    padding: 3px 20px 3px 35px;
+                    clear: both;
+                    font-weight: 400;
+                    color: #428bca;
+                    font-size:12px;
+                    border-top: none;
+                    &:hover{
+                        text-decoration: underline;
+                    }
+                }
             }
         }
     }
@@ -70,13 +109,18 @@ ul.web-property-picker{
     .cmpt-container{
         padding:0px 5px 0 5px;
         .cmpt{
-            float:left;
-            min-width: 300px;
+            //float:left;
+            //min-width: 300px;
             min-height: 210px;
-            background: #FFF;
-            margin-right: 20px;
-            margin-bottom: 20px;
+            //margin-right: 20px;
+            //margin-bottom: 20px;
             .primary{
+                border: 1px solid #DDD;
+                width: 100%;
+                min-height: 210px;
+                background: #FFF;
+                margin-top:20px;
+                float: left;
                 p{
                     text-align:center;
                     &.primary-stat{
@@ -87,8 +131,17 @@ ul.web-property-picker{
                     }
                     &.primary-stat-label{
                         margin:20px 0 0 0;
-                        font-size: 22px;
+                        font-size: 18px;
                         color: #999;
+                    }
+                    &.changed-stat{
+                        font-size: 28px;
+                        &.negitive{
+                            color: red;
+                        }
+                        &.positive{
+                            color: green;
+                        }
                     }
                 }
             }
